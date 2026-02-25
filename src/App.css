@@ -6,11 +6,11 @@
   --bg-hover: #323236;
   --text-main: #e0e0e0;
   --text-muted: #8b8b91;
-  --accent: #589968;
+  --accent: #0f361b;
   --border: #38383e;
   
   --font-mono: 'JetBrains Mono', monospace;
-}
+} 
 
 * {
   box-sizing: border-box;
@@ -23,12 +23,13 @@ body {
   color: var(--text-main);
   font-family: var(--font-mono);
   overflow: hidden;
+  letter-spacing: -1px;
 }
 
 .app-container {
   display: grid;
   grid-template-columns: 220px 1fr;
-  grid-template-rows: 64px calc(100vh - 64px);
+  grid-template-rows: 3rem calc(100vh - 3rem);
   height: 100vh;
   width: 100vw;
   overflow: hidden;
