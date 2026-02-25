@@ -7,6 +7,12 @@
   flex-direction: column;
   padding: 24px 16px;
   gap: 32px;
+  overflow-y: auto;
+  /* hide scrollbar but keep it functional */
+  scrollbar-width: none;
+}
+.sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar-section {
@@ -28,13 +34,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
+  padding: 6px 8px;
   border-radius: 6px;
   color: var(--text-main);
-  text-decoration: none;
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
 }
 
 .sidebar-item:hover {
@@ -46,6 +52,34 @@
   color: #ffffff;
 }
 
+/* Virtual paths (e.g. trash://) — muted, no pointer cursor yet */
+.sidebar-item--virtual {
+  opacity: 0.55;
+  cursor: default;
+}
+.sidebar-item--virtual:hover {
+  background-color: transparent;
+}
+
 .icon-placeholder {
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sidebar-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status / error messages */
+.sidebar-status {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  padding: 8px 12px;
+}
+
+.sidebar-error {
+  color: #e06c75;
 }
