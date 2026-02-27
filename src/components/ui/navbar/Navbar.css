@@ -189,7 +189,9 @@
   cursor: pointer;
   margin-right: 4px;
   flex-shrink: 0;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .search-clear:hover {

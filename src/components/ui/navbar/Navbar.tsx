@@ -6,7 +6,7 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Search01Icon,
-  Cancel01Icon
+  Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { STROKE_SIZES, ICON_SIZES } from '../../../lib/constants';
 
@@ -52,7 +52,12 @@ export const Navbar: React.FC = () => {
           disabled={!canGoBack}
           title="Back (Alt+←)"
         >
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={ICON_SIZES.l} color="currentColor" strokeWidth={STROKE_SIZES.default} />
+          <HugeiconsIcon
+            icon={ArrowLeft01Icon}
+            size={ICON_SIZES.l}
+            color="currentColor"
+            strokeWidth={STROKE_SIZES.default}
+          />
         </button>
         <button
           className="nav-btn"
@@ -60,7 +65,12 @@ export const Navbar: React.FC = () => {
           disabled={!canGoForward}
           title="Forward (Alt+→)"
         >
-          <HugeiconsIcon icon={ArrowRight01Icon} size={ICON_SIZES.l} color="currentColor" strokeWidth={STROKE_SIZES.default} />
+          <HugeiconsIcon
+            icon={ArrowRight01Icon}
+            size={ICON_SIZES.l}
+            color="currentColor"
+            strokeWidth={STROKE_SIZES.default}
+          />
         </button>
       </div>
 
@@ -93,9 +103,16 @@ export const Navbar: React.FC = () => {
         })}
       </nav>
 
-      <div className={`search-wrap${searchFocused ? ' search-wrap--focused' : ''}`}>
+      <div
+        className={`search-wrap${searchFocused ? ' search-wrap--focused' : ''}`}
+      >
         <span className="search-icon">
-          <HugeiconsIcon icon={Search01Icon} size={ICON_SIZES.m} color="currentColor" strokeWidth={STROKE_SIZES.default} />
+          <HugeiconsIcon
+            icon={Search01Icon}
+            size={ICON_SIZES.m}
+            color="currentColor"
+            strokeWidth={STROKE_SIZES.default}
+          />
         </span>
         <input
           ref={searchRef}
@@ -113,16 +130,23 @@ export const Navbar: React.FC = () => {
           <button
             className="search-clear"
             onMouseDown={(e) => {
-              e.preventDefault(); 
+              e.preventDefault();
               setSearchValue('');
             }}
             tabIndex={-1}
             aria-label="Clear search"
           >
-            <HugeiconsIcon icon={Cancel01Icon} size={ICON_SIZES.m} color="currentColor" strokeWidth={STROKE_SIZES.default} />
+            <HugeiconsIcon
+              icon={Cancel01Icon}
+              size={ICON_SIZES.m}
+              color="currentColor"
+              strokeWidth={STROKE_SIZES.default}
+            />
           </button>
         )}
-        <kbd className={`search-kbd${searchFocused || searchValue ? ' search-kbd--hidden' : ''}`}>
+        <kbd
+          className={`search-kbd${searchFocused || searchValue ? ' search-kbd--hidden' : ''}`}
+        >
           ⌘F
         </kbd>
       </div>

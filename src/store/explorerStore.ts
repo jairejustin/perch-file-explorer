@@ -13,8 +13,8 @@ interface ExplorerState {
   files: FileEntry[];
 
   // nav history
-  history: string[];        // visited paths, oldest to newest
-  historyIndex: number;     // pointer into history[]
+  history: string[]; // visited paths, oldest to newest
+  historyIndex: number; // pointer into history[]
   canGoBack: boolean;
   canGoForward: boolean;
 

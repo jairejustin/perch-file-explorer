@@ -37,9 +37,11 @@
   padding: 6px 8px;
   border-radius: 6px;
   color: var(--text-main);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
   user-select: none;
 }
 

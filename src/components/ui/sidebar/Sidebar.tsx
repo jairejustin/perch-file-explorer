@@ -29,19 +29,19 @@ interface SidebarLocation {
 }
 
 const ICON_MAP: Record<string, IconSvgElement> = {
-  home:       Home01Icon,
-  desktop:    ComputerIcon,
-  documents:  File01Icon,
-  downloads:  Download04Icon,
-  music:      MusicNote01Icon,
-  pictures:   Image01Icon,
-  videos:     CameraVideoIcon,
-  trash:      Delete02Icon,
+  home: Home01Icon,
+  desktop: ComputerIcon,
+  documents: File01Icon,
+  downloads: Download04Icon,
+  music: MusicNote01Icon,
+  pictures: Image01Icon,
+  videos: CameraVideoIcon,
+  trash: Delete02Icon,
   filesystem: HardDriveIcon,
-  database:   DatabaseIcon,
-  sdcard:     SdCardIcon,
-  usb:        UsbConnectedIcon,
-  hdd:        HardDriveIcon,
+  database: DatabaseIcon,
+  sdcard: SdCardIcon,
+  usb: UsbConnectedIcon,
+  hdd: HardDriveIcon,
 };
 
 function locationIcon(iconKey: string): IconSvgElement {
@@ -49,7 +49,7 @@ function locationIcon(iconKey: string): IconSvgElement {
 }
 
 const CATEGORY_META = [
-  { key: 'places',  heading: 'Places'  },
+  { key: 'places', heading: 'Places' },
   { key: 'devices', heading: 'Devices' },
   { key: 'network', heading: 'Network' },
 ] as const;
@@ -58,8 +58,8 @@ export const Sidebar: React.FC = () => {
   const { currentPath, navigate } = useExplorerStore();
 
   const [locations, setLocations] = useState<SidebarLocation[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     invoke<SidebarLocation[]>('get_sidebar_locations')
@@ -81,46 +81,52 @@ export const Sidebar: React.FC = () => {
       {loading && <div className="sidebar-status">Loading…</div>}
 
       {error && (
-        <div className="sidebar-status sidebar-error">Failed to load locations</div>
+        <div className="sidebar-status sidebar-error">
+          Failed to load locations
+        </div>
       )}
 
-      {!loading && !error && CATEGORY_META.map(({ key, heading }) => {
-        const items = categories[key];
-        if (!items?.length) return null;
+      {!loading &&
+        !error &&
+        CATEGORY_META.map(({ key, heading }) => {
+          const items = categories[key];
+          if (!items?.length) return null;
 
-        return (
-          <div className="sidebar-section" key={key}>
-            <span className="sidebar-heading">{heading}</span>
+          return (
+            <div className="sidebar-section" key={key}>
+              <span className="sidebar-heading">{heading}</span>
 
-            {items.map((loc) => {
-              // virtual URIs like "trash://" don't map to real FS paths yet
-              const isVirtual = loc.path.endsWith('://');
-              const isActive  = !isVirtual && loc.path === currentPath;
+              {items.map((loc) => {
+                // virtual URIs like "trash://" don't map to real FS paths yet
+                const isVirtual = loc.path.endsWith('://');
+                const isActive = !isVirtual && loc.path === currentPath;
 
-              return (
-                <div
-                  key={loc.path}
-                  className={`sidebar-item${isActive ? ' active' : ''}${isVirtual ? ' sidebar-item--virtual' : ''}`}
-                  onClick={() => !isVirtual && navigate(loc.path)}
-                  title={loc.path}
-                  role="button"
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <span className="icon-placeholder">
-                    <HugeiconsIcon
-                      icon={locationIcon(loc.icon)}
-                      size={ICON_SIZES.m}
-                      color="currentColor"
-                      strokeWidth={isActive ? STROKE_SIZES.default : STROKE_SIZES.thin}
-                    />
-                  </span>
-                  <span className="sidebar-label">{loc.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
+                return (
+                  <div
+                    key={loc.path}
+                    className={`sidebar-item${isActive ? ' active' : ''}${isVirtual ? ' sidebar-item--virtual' : ''}`}
+                    onClick={() => !isVirtual && navigate(loc.path)}
+                    title={loc.path}
+                    role="button"
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    <span className="icon-placeholder">
+                      <HugeiconsIcon
+                        icon={locationIcon(loc.icon)}
+                        size={ICON_SIZES.m}
+                        color="currentColor"
+                        strokeWidth={
+                          isActive ? STROKE_SIZES.default : STROKE_SIZES.thin
+                        }
+                      />
+                    </span>
+                    <span className="sidebar-label">{loc.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
     </aside>
   );
 };
