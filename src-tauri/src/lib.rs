@@ -1,6 +1,7 @@
 use serde::Serialize;
 use std::fs;
 use std::path::PathBuf;
+use std::time::SystemTime;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -8,6 +9,8 @@ struct FileEntry {
     name: String,
     is_dir: bool,
     path: String,
+    size: u64,
+    modified: Option<u64>
 }
 
 #[tauri::command]
@@ -25,7 +28,25 @@ fn get_files(path: &str) -> Result<Vec<FileEntry>, String> {
             }
             let file_path = dir_entry.path().display().to_string();
             let is_dir = dir_entry.path().is_dir();
-            entries.push(FileEntry { name: file_name, is_dir, path: file_path });
+            let mut size = 0;
+            let mut modified = None;
+
+            if let Ok(metadata) = dir_entry.metadata() {
+                size = metadata.len();
+
+                if let Ok(sys_time) = metadata.modified() {
+                    if let Ok(duration) = sys_time.duration_since(SystemTime::UNIX_EPOCH) {
+                        modified = Some(duration.as_secs());
+                    }
+                }
+            }    
+
+            entries.push(FileEntry {
+                name: file_name,
+                is_dir, 
+                path: file_path,
+                size,
+                modified });
         }
     }
 

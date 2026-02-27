@@ -1,3 +1,24 @@
+.file-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.file-list-header {
+  display: grid;
+  grid-template-columns: 1fr 180px 100px;
+  gap: 1rem;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #888);
+  border-bottom: 1px solid var(--border, #eee);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
 .file-list {
   list-style: none;
   margin: 0;
@@ -5,6 +26,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-y: auto;
 }
 
 .file-list__empty {
@@ -13,31 +35,56 @@
 }
 
 .file-list__item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 180px 100px;
   align-items: center;
-  gap: 0.75rem;
-  padding: 2px 12px;
+  gap: 1rem;
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: default;
   user-select: none;
   transition: background-color 0.12s ease;
 }
 
+.file-list__item:hover {
+  background-color: var(--bg-hover, #323236);
+}
+
 .file-list__item--dir {
   cursor: pointer;
 }
 
+.file-list__name-col {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+}
 
 .file-list__icon {
   flex-shrink: 0;
   font-size: 1rem;
   line-height: 1;
+  display: flex;
 }
 
 .file-list__name {
-  font-size: 0.9rem;
+  font-size: 0.825rem;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.file-list__date-col,
+.file-list__size-col {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #888);
+  white-space: nowrap;
+}
+
+.file-list__size-col,
+.header-col-size {
+  text-align: right;
+  padding-right: 16px;
 }
