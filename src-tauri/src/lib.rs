@@ -10,7 +10,13 @@ struct FileEntry {
     is_dir: bool,
     path: String,
     size: u64,
-    modified: Option<u64>
+    modified: Option<u64>,
+}
+
+#[tauri::command]
+fn open_file(path: &str) -> Result<(), String> {
+    open::that(path).map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 #[tauri::command]
@@ -21,7 +27,7 @@ fn get_files(path: &str) -> Result<Vec<FileEntry>, String> {
     for entry in paths {
         if let Ok(dir_entry) = entry {
             let file_name = dir_entry.file_name().into_string().unwrap_or_default();
-            
+
             // skip hidden files (dot-prefixed)
             if file_name.starts_with('.') {
                 continue;
@@ -39,14 +45,15 @@ fn get_files(path: &str) -> Result<Vec<FileEntry>, String> {
                         modified = Some(duration.as_secs());
                     }
                 }
-            }    
+            }
 
             entries.push(FileEntry {
                 name: file_name,
-                is_dir, 
+                is_dir,
                 path: file_path,
                 size,
-                modified });
+                modified,
+            });
         }
     }
 
@@ -80,9 +87,24 @@ fn home_dir() -> PathBuf {
 #[cfg(target_os = "linux")]
 fn mounted_devices() -> Vec<SidebarLocation> {
     let skip_types = [
-        "proc", "sysfs", "devtmpfs", "devpts", "tmpfs", "cgroup", "cgroup2",
-        "pstore", "bpf", "securityfs", "debugfs", "hugetlbfs", "mqueue",
-        "fusectl", "configfs", "efivarfs", "autofs", "fuse.portal",
+        "proc",
+        "sysfs",
+        "devtmpfs",
+        "devpts",
+        "tmpfs",
+        "cgroup",
+        "cgroup2",
+        "pstore",
+        "bpf",
+        "securityfs",
+        "debugfs",
+        "hugetlbfs",
+        "mqueue",
+        "fusectl",
+        "configfs",
+        "efivarfs",
+        "autofs",
+        "fuse.portal",
     ];
 
     let content = match fs::read_to_string("/proc/mounts") {
@@ -164,12 +186,12 @@ fn get_sidebar_locations() -> Vec<SidebarLocation> {
 
     // Common XDG subdirectories
     let xdg_dirs: &[(&str, &str)] = &[
-        ("Desktop",   "desktop"),
+        ("Desktop", "desktop"),
         ("Documents", "documents"),
         ("Downloads", "downloads"),
-        ("Music",     "music"),
-        ("Pictures",  "pictures"),
-        ("Videos",    "videos"),
+        ("Music", "music"),
+        ("Pictures", "pictures"),
+        ("Videos", "videos"),
     ];
 
     for (name, icon) in xdg_dirs {
@@ -184,7 +206,7 @@ fn get_sidebar_locations() -> Vec<SidebarLocation> {
         }
     }
 
-    // trash is a virtual location that file managers can support. 
+    // trash is a virtual location that file managers can support.
     // it does not have a real filesystem path, but we can use a special URL scheme to identify it
     locations.push(SidebarLocation {
         label: "Trash".to_string(),
@@ -212,7 +234,11 @@ fn get_sidebar_locations() -> Vec<SidebarLocation> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![get_files, get_sidebar_locations])
+        .invoke_handler(tauri::generate_handler![
+            get_files,
+            get_sidebar_locations,
+            open_file
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

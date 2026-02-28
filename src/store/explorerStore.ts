@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { invoke } from '@tauri-apps/api/core';
 export interface FileEntry {
   name: string;
   isDir: boolean;
@@ -28,6 +29,7 @@ interface ExplorerState {
   // ACTIONS
 
   navigate: (path: string) => void;
+  openFile: (path: string) => void;
   goBack: () => void;
   goForward: () => void;
   setFiles: (files: FileEntry[]) => void;
@@ -73,6 +75,14 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
       files: [],
       searchQuery: '',
       error: null,
+    });
+  },
+
+  openFile: (path) => {
+    if (!path) return;
+    invoke('open_file', { path }).catch((err) => {
+      console.error('Failed to open file:', err);
+      set({ error: 'Failed to open file' });
     });
   },
 

@@ -87,7 +87,16 @@ const getFileIcon = (filename: string) => {
 };
 
 export function FileList() {
-  const { currentPath, files, setFiles, navigate } = useExplorerStore();
+  const { currentPath, files, setFiles, navigate, openFile } =
+    useExplorerStore();
+
+  const handleOpen = (file: FileEntry) => {
+    if (file.isDir) {
+      navigate(file.path);
+    } else {
+      openFile(file.path);
+    }
+  };
 
   useEffect(() => {
     tauriPath.homeDir().then(navigate).catch(console.error);
@@ -116,7 +125,7 @@ export function FileList() {
             <li
               key={file.path}
               className={`file-list__item${file.isDir ? ' file-list__item--dir' : ''}`}
-              onClick={() => file.isDir && navigate(file.path)}
+              onDoubleClick={() => handleOpen(file)}
             >
               <div className="file-list__name-col">
                 <span className="file-list__icon">
