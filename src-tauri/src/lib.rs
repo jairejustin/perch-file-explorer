@@ -14,10 +14,22 @@ struct FileEntry {
 }
 
 #[tauri::command]
-fn open_file(path: &str) -> Result<(), String> {
-    open::that(path).map_err(|e| e.to_string())?;
+fn open_file(path: &str, with_app: Option<String>) -> Result<(), String> {
+    match with_app {
+        Some(app) => {
+            open::with(app, path).map_err(|e| e.to_string())?;
+        }
+        None => {
+            open::that(path).map_err(|e| e.to_string())?;
+        }
+        
+    }
     Ok(())
 }
+
+// fn rename_file(path: &str, new_name: &str) -> Result<(), String>{
+
+// }
 
 #[tauri::command]
 fn get_files(path: &str) -> Result<Vec<FileEntry>, String> {
