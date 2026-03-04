@@ -1,32 +1,17 @@
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
-export interface FileEntry {
-  name: string;
-  isDir: boolean;
-  path: string;
-  size?: number;
-  modified?: number | null;
-}
+import type { FileEntry } from '../lib/types';
 
 interface ExplorerState {
-  // current location
   currentPath: string;
   files: FileEntry[];
-
-  // nav history
-  history: string[]; // visited paths, oldest to newest
-  historyIndex: number; // pointer into history[]
+  history: string[];
+  historyIndex: number;
   canGoBack: boolean;
   canGoForward: boolean;
-
-  // search
   searchQuery: string;
-
-  // async state
   isLoading: boolean;
   error: string | null;
-
-  // ACTIONS
 
   navigate: (path: string) => void;
   openFile: (path: string) => void;
@@ -36,6 +21,7 @@ interface ExplorerState {
   setSearchQuery: (query: string) => void;
   setIsLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  refreshFiles: () => Promise<void>;
 }
 
 function deriveNavFlags(history: string[], index: number) {
@@ -46,7 +32,6 @@ function deriveNavFlags(history: string[], index: number) {
 }
 
 export const useExplorerStore = create<ExplorerState>((set, get) => ({
-  // init
   currentPath: '',
   files: [],
   history: [],
@@ -59,10 +44,8 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
 
   navigate: (path) => {
     const { history, historyIndex, currentPath } = get();
-
     if (path === currentPath) return;
 
-    // truncate any forward history when branching to a new path
     const newHistory = [...history.slice(0, historyIndex + 1), path];
     const newIndex = newHistory.length - 1;
 
@@ -71,7 +54,6 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
       history: newHistory,
       historyIndex: newIndex,
       ...deriveNavFlags(newHistory, newIndex),
-      // clear stale state
       files: [],
       searchQuery: '',
       error: null,
@@ -116,6 +98,24 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
       files: [],
       error: null,
     });
+  },
+
+  refreshFiles: async () => {
+    const { currentPath } = get();
+    if (!currentPath) return;
+
+    set({ isLoading: true });
+    try {
+      const files = await invoke<FileEntry[]>('get_files', {
+        path: currentPath,
+      });
+      set({ files, error: null });
+    } catch (err) {
+      console.error('Failed to fetch files:', err);
+      set({ error: 'Failed to read directory' });
+    } finally {
+      set({ isLoading: false });
+    }
   },
 
   setFiles: (files) => set({ files }),
