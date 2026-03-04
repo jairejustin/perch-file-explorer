@@ -1,11 +1,67 @@
 .context-menu {
   position: absolute;
-  background-color: var(--background);
+  background-color: var(--bg-base);
   border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  width: 200px;
+  border-radius: 6px;
+  padding: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 8rem;
   min-height: 1rem;
   z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+.context-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 2px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-main);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.1s ease-in-out,
+    color 0.1s ease-in-out;
+}
+
+.context-menu__item:hover {
+  background-color: var(--bg-hover, #f1f5f9);
+  color: #fff;
+}
+
+.context-menu__item:active {
+  background-color: var(--bg-active, #e2e8f0);
+}
+
+.context-menu__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #64748b);
+  width: 16px;
+  height: 16px;
+}
+
+.context-menu__item:hover .context-menu__icon {
+  color: inherit;
+}
+
+.context-menu__label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

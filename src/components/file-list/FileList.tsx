@@ -1,35 +1,67 @@
 import { useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/core';
 import * as tauriPath from '@tauri-apps/api/path';
-import { useExplorerStore, type FileEntry } from '../../store/explorerStore';
+import { useExplorerStore } from '../../store/explorerStore';
+import { useContextMenu } from '../../hooks/useContextMenu';
+import { useFileOperations } from '../../hooks/useFileOperations';
+import ContextMenu from '../ui/context-menu/ContextMenu';
+import type { FileEntry, ContextMenuItem } from '../../lib/types';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ICON_SIZES, STROKE_SIZES } from '../../lib/constants';
 import { Folder01Icon } from '@hugeicons/core-free-icons';
-import './FileList.css';
 import { formatSize, formatDate, getFileIcon } from '../../lib/utils';
+import './FileList.css';
 
 export function FileList() {
-  const { currentPath, files, setFiles, navigate, openFile } =
+  const { currentPath, files, navigate, openFile, refreshFiles } =
     useExplorerStore();
 
-  const handleOpen = (file: FileEntry) => {
-    if (file.isDir) {
-      navigate(file.path);
-    } else {
-      openFile(file.path);
-    }
-  };
+  const {
+    isOpen,
+    x,
+    y,
+    data: activeFile,
+    openMenu,
+    closeMenu,
+  } = useContextMenu<FileEntry>();
+  const { deleteFile } = useFileOperations();
 
   useEffect(() => {
     tauriPath.homeDir().then(navigate).catch(console.error);
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
-    if (!currentPath) return;
-    invoke<FileEntry[]>('get_files', { path: currentPath })
-      .then(setFiles)
-      .catch(console.error);
-  }, [currentPath]);
+    if (currentPath) {
+      refreshFiles();
+    }
+  }, [currentPath, refreshFiles]);
+
+  const handleOpen = (file: FileEntry) => {
+    file.isDir ? navigate(file.path) : openFile(file.path);
+  };
+
+  const menuItems: ContextMenuItem[] = [
+    {
+      label: 'Open',
+      onClick: () => {
+        activeFile && handleOpen(activeFile);
+        closeMenu();
+      },
+    },
+    {
+      label: 'Rename',
+      onClick: () => {
+        console.log('Rename logic for:', activeFile?.name);
+        closeMenu();
+      },
+    },
+    {
+      label: 'Delete',
+      onClick: () => {
+        activeFile && deleteFile(activeFile);
+        closeMenu();
+      },
+    },
+  ];
 
   return (
     <div className="file-list-wrapper">
@@ -48,6 +80,10 @@ export function FileList() {
               key={file.path}
               className={`file-list__item${file.isDir ? ' file-list__item--dir' : ''}`}
               onDoubleClick={() => handleOpen(file)}
+              onContextMenu={(e) => {
+                e.stopPropagation();
+                openMenu(e, file);
+              }}
             >
               <div className="file-list__name-col">
                 <span className="file-list__icon">
@@ -80,6 +116,8 @@ export function FileList() {
           ))
         )}
       </ul>
+
+      {isOpen && <ContextMenu items={menuItems} position={{ x, y }} />}
     </div>
   );
 }
