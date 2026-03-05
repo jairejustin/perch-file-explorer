@@ -19,7 +19,7 @@ import {
   DashboardBrowsingIcon,
 } from '@hugeicons/core-free-icons';
 import type { IconSvgElement } from '@hugeicons/react';
-import { useExplorerStore } from '../../../store/explorerStore';
+import { useExplorerStore } from '../../../store/useExplorerStore';
 
 interface SidebarLocation {
   label: string;

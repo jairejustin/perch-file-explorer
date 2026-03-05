@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import * as tauriPath from '@tauri-apps/api/path';
-import { useExplorerStore } from '../../store/explorerStore';
+import { useExplorerStore } from '../../store/useExplorerStore';
 import { useContextMenu } from '../../hooks/useContextMenu';
 import { useFileOperations } from '../../hooks/useFileOperations';
 import ContextMenu from '../ui/context-menu/ContextMenu';
@@ -23,7 +23,7 @@ export function FileList() {
     openMenu,
     closeMenu,
   } = useContextMenu<FileEntry>();
-  const { deleteFile } = useFileOperations();
+  const { deletePath } = useFileOperations();
 
   useEffect(() => {
     tauriPath.homeDir().then(navigate).catch(console.error);
@@ -57,7 +57,7 @@ export function FileList() {
     {
       label: 'Delete',
       onClick: () => {
-        activeFile && deleteFile(activeFile);
+        activeFile && deletePath(activeFile);
         closeMenu();
       },
     },

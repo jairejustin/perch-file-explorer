@@ -1,11 +1,11 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useExplorerStore } from '../store/explorerStore';
+import { useExplorerStore } from '../store/useExplorerStore';
 import type { FileEntry } from '../lib/types';
 
 export function useFileOperations() {
   const refreshFiles = useExplorerStore((state) => state.refreshFiles);
 
-  const deleteFile = async (file: FileEntry) => {
+  const deletePath = async (file: FileEntry) => {
     try {
       await invoke('delete_file', { path: file.path });
       await refreshFiles();
@@ -23,5 +23,5 @@ export function useFileOperations() {
     }
   };
 
-  return { deleteFile, renameFile };
+  return { deletePath, renameFile };
 }

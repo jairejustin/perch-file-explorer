@@ -27,7 +27,7 @@ fn open_file(path: String, with_app: Option<String>) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn delete_file(path: String) -> Result<(), String> {
+fn delete_path(path: String) -> Result<(), String> {
     let target = PathBuf::from(&path);
 
     if target.is_dir() {
@@ -274,7 +274,7 @@ pub fn run() {
             get_sidebar_locations,
             open_file,
             rename_file,
-            delete_file
+            delete_path
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Navbar.css';
-import { useExplorerStore } from '../../../store/explorerStore';
+import { useExplorerStore } from '../../../store/useExplorerStore';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
   ArrowLeft01Icon,
