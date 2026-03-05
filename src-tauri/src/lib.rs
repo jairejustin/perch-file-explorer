@@ -22,7 +22,6 @@ fn open_file(path: String, with_app: Option<String>) -> Result<(), String> {
         None => {
             open::that(path).map_err(|e| e.to_string())?;
         }
-        
     }
     Ok(())
 }
@@ -94,12 +93,10 @@ struct SidebarLocation {
     label: String,
     path: String,
     icon: String,
-    category: String, // "places" | "devices"
+    category: String,
 }
 
-/// Returns the user's home directory, or "/" as a fallback.
 fn home_dir() -> PathBuf {
-    // std::env::var("HOME") works on Linux/macOS; USERPROFILE on Windows.
     if let Ok(h) = std::env::var("HOME") {
         PathBuf::from(h)
     } else if let Ok(h) = std::env::var("USERPROFILE") {
@@ -109,8 +106,6 @@ fn home_dir() -> PathBuf {
     }
 }
 
-/// Reads /proc/mounts (Linux) and returns real block-device mount points,
-/// excluding virtual filesystems like proc, sysfs, tmpfs, etc.
 #[cfg(target_os = "linux")]
 fn mounted_devices() -> Vec<SidebarLocation> {
     let skip_types = [
@@ -151,27 +146,22 @@ fn mounted_devices() -> Vec<SidebarLocation> {
         let mount_point = cols[1];
         let fs_type = cols[2];
 
-        // skip virtual / kernel filesystems
         if skip_types.contains(&fs_type) {
             continue;
         }
-        // skip the root filesystem and home (already listed under Places)
         if mount_point == "/" || mount_point == home {
             continue;
         }
-        // only real block devices or fuse mounts (e.g. gvfsd, sshfs)
         if !device.starts_with('/') && !device.starts_with("fuse") {
             continue;
         }
 
-        // derive a human-readable label from the last path segment
         let label = PathBuf::from(mount_point)
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or(mount_point)
             .to_string();
 
-        // pick icon hint based on common mount-point patterns
         let icon = if mount_point.contains("sd") || mount_point.contains("mmcblk") {
             "sdcard"
         } else if mount_point.starts_with("/media") || mount_point.starts_with("/run/media") {
@@ -193,7 +183,28 @@ fn mounted_devices() -> Vec<SidebarLocation> {
     devices
 }
 
-/// expandable stub for non-Linux targets
+#[cfg(target_os = "linux")]
+fn get_trash_dir() -> PathBuf {
+    let data_home = std::env::var("XDG_DATA_HOME")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| home_dir().join(".local").join("share"));
+
+    let trash_files_dir = data_home.join("Trash").join("files");
+    
+    if !trash_files_dir.exists() {
+        let _ = fs::create_dir_all(&trash_files_dir);
+    }
+
+    trash_files_dir
+}
+
+#[cfg(not(target_os = "linux"))]
+fn get_trash_dir() -> PathBuf {
+    // TO DO:
+    // Windows and macOS use entirely different APIs for the Recycle Bin/Trash
+    PathBuf::from("/") 
+}
+
 #[cfg(not(target_os = "linux"))]
 fn mounted_devices() -> Vec<SidebarLocation> {
     vec![]
@@ -211,7 +222,6 @@ fn get_sidebar_locations() -> Vec<SidebarLocation> {
         category: "places".to_string(),
     });
 
-    // Common XDG subdirectories
     let xdg_dirs: &[(&str, &str)] = &[
         ("Desktop", "desktop"),
         ("Documents", "documents"),
@@ -233,17 +243,16 @@ fn get_sidebar_locations() -> Vec<SidebarLocation> {
         }
     }
 
-    // trash is a virtual location that file managers can support.
-    // it does not have a real filesystem path, but we can use a special URL scheme to identify it
-    locations.push(SidebarLocation {
-        label: "Trash".to_string(),
-        path: "trash://".to_string(),
-        icon: "trash".to_string(),
-        category: "places".to_string(),
-    });
+    let trash_path = get_trash_dir();
+    if trash_path.exists() {
+        locations.push(SidebarLocation {
+            label: "Trash".to_string(),
+            path: trash_path.display().to_string(),
+            icon: "trash".to_string(),
+            category: "places".to_string(),
+        });
+    }
 
-    // DEVICES
-    // root filesystem always shown
     locations.push(SidebarLocation {
         label: "File System".to_string(),
         path: "/".to_string(),
@@ -251,7 +260,6 @@ fn get_sidebar_locations() -> Vec<SidebarLocation> {
         category: "devices".to_string(),
     });
 
-    // dynamically discovered mounted volumes
     locations.extend(mounted_devices());
 
     locations

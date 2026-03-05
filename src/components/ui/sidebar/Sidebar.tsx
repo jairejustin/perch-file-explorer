@@ -97,15 +97,13 @@ export const Sidebar: React.FC = () => {
               <span className="sidebar-heading">{heading}</span>
 
               {items.map((loc) => {
-                // virtual URIs like "trash://" don't map to real FS paths yet
-                const isVirtual = loc.path.endsWith('://');
-                const isActive = !isVirtual && loc.path === currentPath;
+                const isActive = loc.path === currentPath;
 
                 return (
                   <div
                     key={loc.path}
-                    className={`sidebar-item${isActive ? ' active' : ''}${isVirtual ? ' sidebar-item--virtual' : ''}`}
-                    onClick={() => !isVirtual && navigate(loc.path)}
+                    className={`sidebar-item${isActive ? ' active' : ''}`}
+                    onClick={() => navigate(loc.path)}
                     title={loc.path}
                     role="button"
                     aria-current={isActive ? 'page' : undefined}
