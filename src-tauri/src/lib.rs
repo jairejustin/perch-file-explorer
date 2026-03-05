@@ -27,9 +27,24 @@ fn open_file(path: &str, with_app: Option<String>) -> Result<(), String> {
     Ok(())
 }
 
-// fn rename_file(path: &str, new_name: &str) -> Result<(), String>{
+#[tauri::command]
+fn delete_file(path: String) -> Result<(), String> {
+    let target = PathBuf::from(&path);
 
-// }
+    if target.is_dir() {
+        fs::remove_dir_all(&target).map_err(|e| e.to_string())
+    } else {
+        fs::remove_file(&target).map_err(|e| e.to_string())
+    }
+}
+
+#[tauri::command]
+fn rename_file(old_path: String, new_name: String) -> Result<(), String> {
+    let mut new_path = PathBuf::from(&old_path);
+    new_path.set_file_name(&new_name);
+
+    fs::rename(&old_path, &new_path).map_err(|e| e.to_string())
+}
 
 #[tauri::command]
 fn get_files(path: &str) -> Result<Vec<FileEntry>, String> {
@@ -249,7 +264,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_files,
             get_sidebar_locations,
-            open_file
+            open_file,
+            rename_file,
+            delete_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
