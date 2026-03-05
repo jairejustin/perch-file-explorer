@@ -14,7 +14,7 @@ struct FileEntry {
 }
 
 #[tauri::command]
-fn open_file(path: &str, with_app: Option<String>) -> Result<(), String> {
+fn open_file(path: String, with_app: Option<String>) -> Result<(), String> {
     match with_app {
         Some(app) => {
             open::with(app, path).map_err(|e| e.to_string())?;
@@ -47,9 +47,9 @@ fn rename_file(old_path: String, new_name: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn get_files(path: &str) -> Result<Vec<FileEntry>, String> {
+fn get_files(path: String) -> Result<Vec<FileEntry>, String> {
     let mut entries = Vec::new();
-    let paths = fs::read_dir(path).map_err(|e| e.to_string())?;
+    let paths = fs::read_dir(&path).map_err(|e| e.to_string())?;
 
     for entry in paths {
         if let Ok(dir_entry) = entry {
