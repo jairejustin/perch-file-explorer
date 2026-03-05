@@ -17,7 +17,7 @@ struct FileEntry {
 fn open_file(path: String, with_app: Option<String>) -> Result<(), String> {
     match with_app {
         Some(app) => {
-            open::with(app, path).map_err(|e| e.to_string())?;
+            open::with(path, app).map_err(|e| e.to_string())?;
         }
         None => {
             open::that(path).map_err(|e| e.to_string())?;
